@@ -7,10 +7,20 @@ import (
 	"strings"
 )
 
+type locationArea struct {
+	Name string `json:"name"`
+}
+
+type config struct {
+	Results  []locationArea `json:"results"`
+	Next     string         `json:"next"`
+	Previous string         `json:"previous"`
+}
+
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -25,10 +35,20 @@ func getCommands() map[string]cliCommand {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "Displays the next batch of 20 location-areas",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the previous batch of 20 location-areas",
+			callback:    commandMapb,
+		},
 	}
 }
 
-func startRepl() {
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -43,7 +63,7 @@ func startRepl() {
 
 		command, exists := getCommands()[commandWord]
 		if exists {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
