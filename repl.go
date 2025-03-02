@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/OferRavid/pokedexcli/internal/pokecache"
 )
 
 type locationArea struct {
@@ -20,7 +22,7 @@ type config struct {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, *pokecache.Cache) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -48,7 +50,7 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
-func startRepl(cfg *config) {
+func startRepl(cfg *config, cache *pokecache.Cache) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -63,7 +65,7 @@ func startRepl(cfg *config) {
 
 		command, exists := getCommands()[commandWord]
 		if exists {
-			err := command.callback(cfg)
+			err := command.callback(cfg, cache)
 			if err != nil {
 				fmt.Println(err)
 			}

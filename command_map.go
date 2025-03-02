@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/OferRavid/pokedexcli/internal/pokecache"
 )
 
 const (
@@ -20,7 +22,7 @@ var (
 	firstPage   = fmt.Sprintf("%s?offset=%d&limit=%d", baseURL, offset, limit)
 )
 
-func fetchLocationAreas(cfg *config, apiURL string) error {
+func fetchLocationAreas(cfg *config, cache *pokecache.Cache, apiURL string) error {
 	client := &http.Client{Timeout: 10 * time.Second}
 
 	resp, err := client.Get(apiURL)
@@ -42,10 +44,23 @@ func fetchLocationAreas(cfg *config, apiURL string) error {
 		return fmt.Errorf("failed to parse JSON: %w", err)
 	}
 
+	cache.Add(apiURL, body)
+
 	return nil
 }
 
-func commandMap(cfg *config) error {
+func fetchLocationAreasFromCache(cfg *config, cache *pokecache.Cache, apiURL string) bool {
+	if val, exists := cache.Get(apiURL); exists {
+		if err := json.Unmarshal(val, cfg); err != nil {
+			return false
+		}
+		return true
+	}
+
+	return false
+}
+
+func commandMap(cfg *config, cache *pokecache.Cache) error {
 	isFirstPage = false
 	url := cfg.Next
 	if cfg.Next == "" && cfg.Previous == "" {
@@ -54,9 +69,12 @@ func commandMap(cfg *config) error {
 		fmt.Println("No more location areas to show.")
 		return nil
 	}
-	err := fetchLocationAreas(cfg, url)
-	if err != nil {
-		return err
+
+	if ok := fetchLocationAreasFromCache(cfg, cache, url); !ok {
+		err := fetchLocationAreas(cfg, cache, url)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, area := range cfg.Results {
@@ -66,7 +84,7 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, cache *pokecache.Cache) error {
 	if isFirstPage || cfg.Previous == "" {
 		return errors.New("you're on the first page")
 	}
@@ -74,9 +92,12 @@ func commandMapb(cfg *config) error {
 	if cfg.Previous == firstPage {
 		isFirstPage = true
 	}
-	err := fetchLocationAreas(cfg, cfg.Previous)
-	if err != nil {
-		return err
+
+	if ok := fetchLocationAreasFromCache(cfg, cache, cfg.Previous); !ok {
+		err := fetchLocationAreas(cfg, cache, cfg.Previous)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, area := range cfg.Results {
