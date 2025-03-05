@@ -6,23 +6,19 @@ import (
 	"os"
 	"strings"
 
-	"github.com/OferRavid/pokedexcli/internal/pokecache"
+	"github.com/OferRavid/pokedexcli/internal/pokeapi"
 )
 
-type locationArea struct {
-	Name string `json:"name"`
-}
-
 type config struct {
-	Results  []locationArea `json:"results"`
-	Next     string         `json:"next"`
-	Previous string         `json:"previous"`
+	pokeapiClient        pokeapi.Client
+	NextLocationsURL     *string `json:"next"`
+	PreviousLocationsURL *string `json:"previous"`
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, *pokecache.Cache) error
+	callback    func(*config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -47,10 +43,15 @@ func getCommands() map[string]cliCommand {
 			description: "Displays the previous batch of 20 location-areas",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:        "explore <location_name>",
+			description: "Explore a location",
+			callback:    commandExplore,
+		},
 	}
 }
 
-func startRepl(cfg *config, cache *pokecache.Cache) {
+func startRepl(cfg *config, args ...string) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -62,10 +63,14 @@ func startRepl(cfg *config, cache *pokecache.Cache) {
 		}
 
 		commandWord := words[0]
+		args := []string{}
+		if len(words) > 1 {
+			args = words[1:]
+		}
 
 		command, exists := getCommands()[commandWord]
 		if exists {
-			err := command.callback(cfg, cache)
+			err := command.callback(cfg, args...)
 			if err != nil {
 				fmt.Println(err)
 			}
