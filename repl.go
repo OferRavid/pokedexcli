@@ -10,6 +10,8 @@ import (
 )
 
 type config struct {
+	caughtPokemon        map[string]pokeapi.Pokemon
+	caughtPokemonCount   map[string]int
 	pokeapiClient        pokeapi.Client
 	NextLocationsURL     *string `json:"next"`
 	PreviousLocationsURL *string `json:"previous"`
@@ -48,10 +50,15 @@ func getCommands() map[string]cliCommand {
 			description: "Explore a location",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch <pokemon_name>",
+			description: "Attempt to catch a Pokemon encountered in area",
+			callback:    commandCatch,
+		},
 	}
 }
 
-func startRepl(cfg *config, args ...string) {
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
