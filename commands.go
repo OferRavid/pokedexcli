@@ -96,10 +96,31 @@ func commandCatch(cfg *config, args ...string) error {
 			cfg.caughtPokemonCount[pokemon.Name] = 1
 			cfg.caughtPokemon[pokemon.Name] = pokemon
 		}
-
+		fmt.Println("You may now inspect it with the inspect command.")
 	} else {
 		fmt.Printf("%s escaped!\n", pokemon.Name)
 	}
 
 	return nil
+}
+
+func commandInspect(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("you must provide a pokemon name")
+	}
+	name := args[0]
+	if pokemon, ok := cfg.caughtPokemon[name]; ok {
+		fmt.Printf("Name: %s\nHeight: %d\nWeight: %d\n", pokemon.Name, pokemon.Height, pokemon.Weight)
+		fmt.Println("Stats:")
+		for _, stat := range pokemon.Stats {
+			fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+		}
+		fmt.Println("Types:")
+		for _, typeInfo := range pokemon.Types {
+			fmt.Printf("  - %s\n", typeInfo.Type.Name)
+		}
+		return nil
+	}
+
+	return fmt.Errorf("can't show information on %s. you need to catch one first", name)
 }
