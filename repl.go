@@ -12,6 +12,7 @@ import (
 type config struct {
 	caughtPokemon        map[string]pokeapi.Pokemon
 	caughtPokemonCount   map[string]int
+	areaExplored         []string
 	pokeapiClient        pokeapi.Client
 	NextLocationsURL     *string `json:"next"`
 	PreviousLocationsURL *string `json:"previous"`
@@ -47,18 +48,23 @@ func getCommands() map[string]cliCommand {
 		},
 		"explore": {
 			name:        "explore <location_name>",
-			description: "Explore a location",
+			description: "Displays all Pokemon in the area given",
 			callback:    commandExplore,
 		},
 		"catch": {
 			name:        "catch <pokemon_name>",
-			description: "Attempt to catch a Pokemon encountered in area",
+			description: "Attempts to catch a Pokemon encountered in area",
 			callback:    commandCatch,
 		},
 		"inspect": {
 			name:        "inspect <pokemon_name>",
-			description: "Show details about a caught Pokemon",
+			description: "Shows details about a caught Pokemon",
 			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Displays all the Pokemon you caught",
+			callback:    commandPokedex,
 		},
 	}
 }

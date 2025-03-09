@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"slices"
 )
 
 func commandHelp(cfg *config, args ...string) error {
@@ -71,8 +72,12 @@ func commandExplore(cfg *config, args ...string) error {
 	}
 	fmt.Printf("Exploring %s...\n", location.Name)
 	fmt.Println("Found Pokemon: ")
+	cfg.areaExplored = []string{}
+	cfg.areaExplored = append(cfg.areaExplored, location.Name)
 	for _, enc := range location.PokemonEncounters {
-		fmt.Printf(" - %s\n", enc.Pokemon.Name)
+		name := enc.Pokemon.Name
+		fmt.Printf(" - %s\n", name)
+		cfg.areaExplored = append(cfg.areaExplored, name)
 	}
 
 	return nil
@@ -83,6 +88,12 @@ func commandCatch(cfg *config, args ...string) error {
 		return errors.New("you must provide a pokemon name")
 	}
 	name := args[0]
+	if len(cfg.areaExplored) == 0 {
+		return errors.New("you must explore an area for Pokemon encounters first")
+	}
+	if ok := slices.Contains(cfg.areaExplored, name); !ok {
+		return fmt.Errorf("you didn't encounter %s in %s.\nexplore %s again to see the Pokemon encountered", name, cfg.areaExplored[0], cfg.areaExplored[0])
+	}
 	pokemon, err := cfg.pokeapiClient.GetPokemon(name)
 	if err != nil {
 		return err
@@ -123,4 +134,16 @@ func commandInspect(cfg *config, args ...string) error {
 	}
 
 	return fmt.Errorf("can't show information on %s. you need to catch one first", name)
+}
+
+func commandPokedex(cfg *config, args ...string) error {
+	if len(cfg.caughtPokemon) > 0 {
+		fmt.Println("Your Pokedex:")
+		for name, _ := range cfg.caughtPokemon {
+			fmt.Printf(" - %s\n", name)
+		}
+		return nil
+	}
+
+	return errors.New("your pokedex is empty. go catch some pokemon")
 }
