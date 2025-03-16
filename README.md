@@ -17,20 +17,22 @@ The project is organized into the following packages:
 ### `main` (Root Package)
 Handles the REPL (Read-Eval-Print Loop), command processing, and application logic.
 
-- `main.go`: Initializes the application and starts the REPL.
-- `commands.go`: Implements the CLI commands.
-- `repl.go`: Manages the interactive REPL interface.
+- [`main.go`](https://github.com/OferRavid/pokedexcli/blob/main/main.go): Initializes the application and starts the REPL.
+- [`commands.go`](https://github.com/OferRavid/pokedexcli/blob/main/commands.go): Implements the CLI commands.
+- [`repl.go`](https://github.com/OferRavid/pokedexcli/blob/main/repl.go): Manages the interactive REPL interface.
 
 ### `internal/pokeapi`
 Interacts with the PokéAPI to fetch Pokémon and location data.
 
-- `client.go`: Defines the API client for making HTTP requests and caching responses.
-- `location_types.go`: Defines data structures for locations and encounters.
-- `pokemon.go`: Defines data structures for Pokémon details.
-- `pokeapi.go`: Contains base API URLs and constants.
+- [`client.go`](https://github.com/OferRavid/pokedexcli/blob/main/internal/pokeapi/client.go): Defines the API client for making HTTP requests and caching responses.
+- [`location_types.go`](https://github.com/OferRavid/pokedexcli/blob/main/internal/pokeapi/location_types.go): Defines data structures for locations and encounters.
+- [`pokemon.go`](https://github.com/OferRavid/pokedexcli/blob/main/internal/pokeapi/pokemon.go): Defines data structures for Pokémon details.
+- [`pokeapi.go`](https://github.com/OferRavid/pokedexcli/blob/main/internal/pokeapi/pokeapi.go): Contains base API URLs and constants.
 
 ### `internal/pokecache`
 Implements an in-memory cache to reduce redundant API calls and improve performance.
+
+- [`pokecache.go`](https://github.com/OferRavid/pokedexcli/blob/main/internal/pokecache/pokecache.go): Defines the Cache struct and its constructor and methods.
 
 ---
 
@@ -132,7 +134,7 @@ Closing the Pokedex... Goodbye!
 Feel free to fork this repository and submit pull requests! Suggestions and improvements are always welcome. 
 
 ## License
-This project is open-source and available under the MIT License. See `LICENSE` for details.
+This project is open-source and available under the MIT License. See [`LICENSE`](https://github.com/OferRavid/pokedexcli/blob/main/LICENSE) for details.
 
 ---
 
