@@ -24,17 +24,21 @@ type cliCommand struct {
 	callback    func(*config, ...string) error
 }
 
+/*
+getCommands returns a map of available CLI commands, each associated with a name,
+description, and a corresponding callback function.
+*/
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
-		},
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
 		},
 		"map": {
 			name:        "map",
@@ -53,7 +57,7 @@ func getCommands() map[string]cliCommand {
 		},
 		"catch": {
 			name:        "catch <pokemon_name>",
-			description: "Attempts to catch a Pokemon encountered in area",
+			description: "Attempts to catch a Pokemon encountered in an area",
 			callback:    commandCatch,
 		},
 		"inspect": {
@@ -69,6 +73,10 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
+/*
+startRepl initializes and runs the REPL (Read-Eval-Print Loop) for the Pokedex CLI.
+It continuously reads user input, processes commands, and executes corresponding functions.
+*/
 func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -100,6 +108,11 @@ func startRepl(cfg *config) {
 	}
 }
 
+/*
+cleanInput processes the user input by converting it to lowercase,
+trimming spaces, and splitting it into individual words.
+Returns a slice of cleaned words.
+*/
 func cleanInput(text string) []string {
 	lowered := strings.ToLower(text)
 	trimmed := strings.TrimSpace(lowered)

@@ -8,6 +8,10 @@ import (
 	"slices"
 )
 
+/*
+commandHelp prints a help message displaying available commands and their descriptions.
+It takes a config struct but does not use it.
+*/
 func commandHelp(cfg *config, args ...string) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
@@ -20,12 +24,20 @@ func commandHelp(cfg *config, args ...string) error {
 	return nil
 }
 
+/*
+commandExit prints a farewell message and exits the program.
+It does not return an error.
+*/
 func commandExit(cfg *config, args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
+/*
+commandMap retrieves and prints the next batch of location areas using the PokeAPI client.
+It updates the configuration with new pagination URLs.
+*/
 func commandMap(cfg *config, args ...string) error {
 	locationsResp, err := cfg.pokeapiClient.ListLocations(cfg.NextLocationsURL)
 	if err != nil {
@@ -41,6 +53,10 @@ func commandMap(cfg *config, args ...string) error {
 	return nil
 }
 
+/*
+commandMapb retrieves and prints the previous batch of location areas using the PokeAPI client.
+It updates the configuration with new pagination URLs.
+*/
 func commandMapb(cfg *config, args ...string) error {
 	if cfg.PreviousLocationsURL == nil {
 		return errors.New("you're on the first page")
@@ -60,6 +76,10 @@ func commandMapb(cfg *config, args ...string) error {
 	return nil
 }
 
+/*
+commandExplore retrieves and displays the Pokemon encountered in a specified location.
+It updates the explored area in the configuration.
+*/
 func commandExplore(cfg *config, args ...string) error {
 	if len(args) != 1 {
 		return errors.New("you must provide a location name")
@@ -83,6 +103,10 @@ func commandExplore(cfg *config, args ...string) error {
 	return nil
 }
 
+/*
+commandCatch attempts to catch a specified Pokemon encountered in an explored area.
+It checks if the Pokemon was encountered before allowing the capture attempt.
+*/
 func commandCatch(cfg *config, args ...string) error {
 	if len(args) != 1 {
 		return errors.New("you must provide a pokemon name")
@@ -115,6 +139,10 @@ func commandCatch(cfg *config, args ...string) error {
 	return nil
 }
 
+/*
+commandInspect displays detailed information about a caught Pokemon.
+If the Pokemon has not been caught, it returns an error.
+*/
 func commandInspect(cfg *config, args ...string) error {
 	if len(args) != 1 {
 		return errors.New("you must provide a pokemon name")
@@ -124,11 +152,11 @@ func commandInspect(cfg *config, args ...string) error {
 		fmt.Printf("Name: %s\nHeight: %d\nWeight: %d\n", pokemon.Name, pokemon.Height, pokemon.Weight)
 		fmt.Println("Stats:")
 		for _, stat := range pokemon.Stats {
-			fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+			fmt.Printf(" - %s: %d\n", stat.Stat.Name, stat.BaseStat)
 		}
 		fmt.Println("Types:")
 		for _, typeInfo := range pokemon.Types {
-			fmt.Printf("  - %s\n", typeInfo.Type.Name)
+			fmt.Printf(" - %s\n", typeInfo.Type.Name)
 		}
 		return nil
 	}
@@ -136,10 +164,14 @@ func commandInspect(cfg *config, args ...string) error {
 	return fmt.Errorf("can't show information on %s. you need to catch one first", name)
 }
 
+/*
+commandPokedex displays a list of all caught Pokemon.
+If no Pokemon have been caught, it returns an error.
+*/
 func commandPokedex(cfg *config, args ...string) error {
 	if len(cfg.caughtPokemon) > 0 {
 		fmt.Println("Your Pokedex:")
-		for name, _ := range cfg.caughtPokemon {
+		for name := range cfg.caughtPokemon {
 			fmt.Printf(" - %s\n", name)
 		}
 		return nil

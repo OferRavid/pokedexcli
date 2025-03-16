@@ -9,13 +9,24 @@ import (
 	"github.com/OferRavid/pokedexcli/internal/pokecache"
 )
 
-// Client -
+// Client handles HTTP requests to the PokéAPI with caching functionality.
 type Client struct {
 	cache      pokecache.Cache
 	httpClient http.Client
 }
 
-// NewClient -
+/*
+NewClient creates and returns a new Client instance.
+
+The client includes a cache for API responses and a configured HTTP client.
+
+Parameters:
+- timeout: The maximum duration for an HTTP request.
+- cacheInterval: The expiration interval for cached responses.
+
+Returns:
+- Client: A new API client instance.
+*/
 func NewClient(timeout, cacheInterval time.Duration) Client {
 	return Client{
 		cache: pokecache.NewCache(cacheInterval),
@@ -25,7 +36,18 @@ func NewClient(timeout, cacheInterval time.Duration) Client {
 	}
 }
 
-// ListLocations -
+/*
+ListLocations retrieves a paginated list of location areas from the PokéAPI.
+
+If the requested page URL is cached, the cached response is returned.
+
+Parameters:
+- pageURL: An optional pointer to a string representing the next/previous page URL.
+
+Returns:
+- LocationAreaList: The response containing location areas.
+- error: An error if the request or JSON decoding fails.
+*/
 func (c *Client) ListLocations(pageURL *string) (LocationAreaList, error) {
 	url := baseURL + "/location-area"
 	if pageURL != nil {
@@ -68,7 +90,16 @@ func (c *Client) ListLocations(pageURL *string) (LocationAreaList, error) {
 	return locationsResp, nil
 }
 
-// GetLocation -
+/*
+GetLocation retrieves detailed information about a specific location area.
+
+Parameters:
+- locationName: The name of the location area to fetch.
+
+Returns:
+- LocationArea: The response containing location details.
+- error: An error if the request or JSON decoding fails.
+*/
 func (c *Client) GetLocation(locationName string) (LocationArea, error) {
 	url := baseURL + "/location-area/" + locationName
 
@@ -108,6 +139,16 @@ func (c *Client) GetLocation(locationName string) (LocationArea, error) {
 	return locationResp, nil
 }
 
+/*
+GetPokemon retrieves details about a specific Pokémon by name.
+
+Parameters:
+- pokemonName: The name of the Pokémon to fetch.
+
+Returns:
+- Pokemon: The response containing Pokémon details.
+- error: An error if the request or JSON decoding fails.
+*/
 func (c *Client) GetPokemon(pokemonName string) (Pokemon, error) {
 	url := baseURL + "/pokemon/" + pokemonName
 
